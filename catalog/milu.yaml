@@ -1,0 +1,36 @@
+apiVersion: platform.internal/v1
+kind: System
+
+metadata:
+  name: milu-software
+  title: MILU Software
+  description: Portal operacional do produto MILU Software
+
+spec:
+  owner: REPLACE_ME
+  lifecycle: production
+  providers:
+    github:
+      connection: github-milu
+      repositories:
+        - name: repository-placeholder
+          fullName: REPLACE_ME
+          defaultBranch: main
+    render:
+      connection: render-milu
+      services:
+        - name: frontend
+          serviceId: REPLACE_ME
+        - name: backend
+          serviceId: REPLACE_ME
+    supabase:
+      connection: supabase-milu
+      projects:
+        - name: main
+          projectRef: REPLACE_ME
+  healthChecks:
+    - name: backend
+      url: https://example.com/REPLACE_ME/health
+      expectedStatus: 200
+  documentation:
+    repositoryReadme: README.md

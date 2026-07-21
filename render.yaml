@@ -1,0 +1,67 @@
+services:
+  - type: web
+    name: idp-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: BACKEND_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: ALLOWED_ADMIN_EMAILS
+        sync: false
+      - key: GITHUB_APP_ID
+        sync: false
+      - key: GITHUB_APP_PRIVATE_KEY
+        sync: false
+      - key: GITHUB_INSTALLATION_ID_MILU
+        sync: false
+      - key: GITHUB_INSTALLATION_ID_COLORGLASS
+        sync: false
+      - key: GITHUB_INSTALLATION_ID_SUPEREXCEL
+        sync: false
+      - key: RENDER_API_KEY_MILU
+        sync: false
+      - key: RENDER_API_KEY_COLORGLASS
+        sync: false
+      - key: RENDER_API_KEY_SUPEREXCEL
+        sync: false
+      - key: SUPABASE_MANAGEMENT_TOKEN_MILU
+        sync: false
+      - key: SUPABASE_MANAGEMENT_TOKEN_COLORGLASS
+        sync: false
+      - key: SUPABASE_MANAGEMENT_TOKEN_SUPEREXCEL
+        sync: false
+      - key: SYNC_ENABLED
+        value: "true"
+      - key: CATALOG_DIRECTORY
+        value: /app/catalog
+
+  - type: web
+    name: idp-frontend
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NEXT_PUBLIC_BACKEND_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false

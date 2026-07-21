@@ -1,0 +1,12 @@
+{
+  "include": ["app"],
+  "exclude": ["tests"],
+  "pythonVersion": "3.13",
+  "typeCheckingMode": "basic",
+  "reportMissingTypeStubs": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownParameterType": false,
+  "reportAny": false
+}

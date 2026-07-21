@@ -1,0 +1,36 @@
+apiVersion: platform.internal/v1
+kind: System
+
+metadata:
+  name: colorglass
+  title: ColorGlass
+  description: Portal operacional do produto ColorGlass
+
+spec:
+  owner: REPLACE_ME
+  lifecycle: production
+  providers:
+    github:
+      connection: github-colorglass
+      repositories:
+        - name: repository-placeholder
+          fullName: REPLACE_ME
+          defaultBranch: main
+    render:
+      connection: render-colorglass
+      services:
+        - name: frontend
+          serviceId: REPLACE_ME
+        - name: backend
+          serviceId: REPLACE_ME
+    supabase:
+      connection: supabase-colorglass
+      projects:
+        - name: main
+          projectRef: REPLACE_ME
+  healthChecks:
+    - name: backend
+      url: https://example.com/REPLACE_ME/health
+      expectedStatus: 200
+  documentation:
+    repositoryReadme: README.md

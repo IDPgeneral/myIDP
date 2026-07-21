@@ -1,0 +1,32 @@
+{
+  "name": "idp-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p 10000",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.12.3",
+    "@supabase/supabase-js": "2.110.7",
+    "next": "16.2.10",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.2.10",
+    "jsdom": "29.1.1",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}
