@@ -68,7 +68,11 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
-        origins = [*self.cors_origins.split(","), self.frontend_url]
+        origins = [
+            *self.cors_origins.split(","),
+            self.frontend_url,
+            "https://idp-frontend-bqf0.onrender.com",
+        ]
         return list(dict.fromkeys(origin.strip().rstrip("/") for origin in origins if origin.strip()))
 
     @property
