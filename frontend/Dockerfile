@@ -1,4 +1,6 @@
 FROM node:24.14-bookworm-slim AS deps
+ENV NPM_CONFIG_REGISTRY=https://registry.npmjs.org/ \
+    NPM_CONFIG_REPLACE_REGISTRY_HOST=always
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
