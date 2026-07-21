@@ -10,7 +10,7 @@ services:
       - key: APP_ENV
         value: production
       - key: AUTH_DISABLED
-        value: "true"
+        value: "false"
       - key: DATABASE_URL
         sync: false
       - key: FRONTEND_URL
