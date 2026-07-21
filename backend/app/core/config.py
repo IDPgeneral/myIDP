@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     supabase_publishable_key: str = ""
     supabase_anon_key: str = ""
     supabase_jwt_secret: str = ""
-    auth_disabled: bool = True
+    auth_disabled: bool = False
 
     allowed_admin_emails: str = ""
     cors_origins: str = "http://localhost:3000"
