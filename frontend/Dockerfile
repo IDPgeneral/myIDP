@@ -1,9 +1,9 @@
-FROM node:22-alpine AS deps
+FROM node:20.19-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --no-audit --no-fund
 
-FROM node:22-alpine AS builder
+FROM node:20.19-alpine AS builder
 WORKDIR /app
 
 ARG NEXT_PUBLIC_BACKEND_URL
