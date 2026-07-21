@@ -1,9 +1,9 @@
-FROM node:20.19-alpine AS deps
+FROM node:24.14-bookworm-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
-FROM node:20.19-alpine AS builder
+FROM node:24.14-bookworm-slim AS builder
 WORKDIR /app
 
 ARG NEXT_PUBLIC_BACKEND_URL
@@ -19,7 +19,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-FROM node:22-alpine AS runner
+FROM node:24.14-bookworm-slim AS runner
 WORKDIR /app
 ENV NODE_ENV=production PORT=10000 NEXT_TELEMETRY_DISABLED=1
 COPY --from=builder /app/.next/standalone ./

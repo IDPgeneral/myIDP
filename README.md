@@ -57,7 +57,7 @@ developer-portal/
 ## Pré-requisitos
 
 - Python 3.13
-- Node.js 22
+- Node.js 22+ (imagem de produção fixada em Node.js 24.14)
 - PostgreSQL 15+
 - Projeto Supabase exclusivo do IDP
 - Google OAuth habilitado no Supabase Auth
@@ -150,6 +150,8 @@ A importação exige Admin.
 
 O frontend lê snapshots locais. As APIs externas não são consultadas ao abrir uma página.
 
+Cada snapshot Render também coleta CPU, memória, tráfego e disco nas últimas 24 horas. Cada snapshot Supabase coleta tamanho do banco, Storage, disco e volume de requisições. A interface sinaliza 75% como aviso e 90% como crítico. Cotas mensais compartilhadas aparecem explicitamente como `workspace` ou `organização`.
+
 Intervalos padrão:
 
 - health checks: 5 minutos;
@@ -210,7 +212,7 @@ Leia `docs/deployment.md`.
 
 ## Limitações atuais
 
-- métricas Supabase dependem do que a Management API disponibilizar no snapshot;
+- algumas cotas mensais de Render e Supabase não expõem consumo pela Management API; nesses casos o limite do plano é exibido com o uso marcado como indisponível;
 - contagens de issues e PRs usam a primeira página de até 100 itens;
 - rate limit é local a cada instância Render;
 - scheduler APScheduler pressupõe uma única instância ativa do backend no MVP;

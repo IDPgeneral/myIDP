@@ -34,6 +34,11 @@ Leitura:
 - URL;
 - deploys recentes;
 - commit e status do último deploy.
+- pico de CPU e memória nas últimas 24 horas e os respectivos limites;
+- tráfego de saída em 24 horas;
+- uso e capacidade de disco persistente quando o serviço possui disco.
+
+No plano Free, a cota de 750 horas mensais é mostrada como cota compartilhada do workspace. A API pública do Render não expõe o consumo mensal dessa cota, portanto o IDP não estima esse número.
 
 Ações opcionais:
 
@@ -55,8 +60,20 @@ Leitura:
 - metadados de banco disponíveis;
 - health de serviços suportados;
 - link de dashboard.
+- tamanho real do banco e dos objetos do Storage por consulta fixa read-only;
+- utilização/configuração de disco e contagem de requisições quando a Management API autoriza;
+- cotas conhecidas do plano Free, sempre identificando quando são compartilhadas pela organização.
 
-O cliente não consulta API keys do projeto com `reveal`, não executa SQL e não altera Auth/RLS.
+O cliente não consulta API keys do projeto com `reveal`, não altera Auth/RLS e não aceita SQL arbitrário. A única consulta SQL é fixa, somente leitura e usada para medir `pg_database_size` e `storage.objects`.
+
+## Alertas de consumo
+
+- abaixo de 75%: normal;
+- de 75% a 89,9%: aviso;
+- a partir de 90%: crítico;
+- sem valor ou limite exposto pelo provedor: desconhecido, sem estimativas artificiais.
+
+As métricas ficam dentro de `resource_snapshots`, junto ao restante do snapshot sanitizado. Falhas de endpoints opcionais não interrompem a sincronização do recurso.
 
 ## Teste de conexão
 

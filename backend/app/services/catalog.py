@@ -33,12 +33,14 @@ class RenderServiceSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str
     serviceId: str
+    plan: str = "free"
 
 
 class SupabaseProjectSpec(BaseModel):
     model_config = ConfigDict(extra="forbid")
     name: str
     projectRef: str
+    plan: str = "free"
 
 
 class GitHubProviderSpec(BaseModel):
@@ -160,15 +162,19 @@ def import_catalog_document(db: Session, document: CatalogDocument) -> dict[str,
         for service in providers.render.services:
             existing = db.scalar(select(ProductResource).where(ProductResource.provider_account_id == account.id, ProductResource.resource_type == "render_service", ProductResource.external_id == service.serviceId))
             if existing is None:
-                db.add(ProductResource(product_id=product.id, provider_account_id=account.id, resource_type="render_service", external_id=service.serviceId, name=service.name, environment="production", metadata_json={}, active=service.serviceId not in PLACEHOLDER_VALUES))
+                db.add(ProductResource(product_id=product.id, provider_account_id=account.id, resource_type="render_service", external_id=service.serviceId, name=service.name, environment="production", metadata_json={"plan": service.plan}, active=service.serviceId not in PLACEHOLDER_VALUES))
                 created["resources"] += 1
+            else:
+                existing.metadata_json = {**existing.metadata_json, "plan": service.plan}
     if providers.supabase:
         account = account_by_name(providers.supabase.connection)
         for project in providers.supabase.projects:
             existing = db.scalar(select(ProductResource).where(ProductResource.provider_account_id == account.id, ProductResource.resource_type == "supabase_project", ProductResource.external_id == project.projectRef))
             if existing is None:
-                db.add(ProductResource(product_id=product.id, provider_account_id=account.id, resource_type="supabase_project", external_id=project.projectRef, name=project.name, environment="production", metadata_json={}, active=project.projectRef not in PLACEHOLDER_VALUES))
+                db.add(ProductResource(product_id=product.id, provider_account_id=account.id, resource_type="supabase_project", external_id=project.projectRef, name=project.name, environment="production", metadata_json={"plan": project.plan}, active=project.projectRef not in PLACEHOLDER_VALUES))
                 created["resources"] += 1
+            else:
+                existing.metadata_json = {**existing.metadata_json, "plan": project.plan}
     for check in document.spec.healthChecks:
         existing = db.scalar(select(HealthCheck).where(HealthCheck.product_id == product.id, HealthCheck.name == check.name))
         if existing is None:

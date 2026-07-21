@@ -74,6 +74,40 @@ export interface ProductDetail {
   health_checks: HealthResult[];
 }
 
+export interface UsageMetric {
+  key: string;
+  label: string;
+  value: number | null;
+  limit: number | null;
+  unit: string;
+  percentage: number | null;
+  status: "ok" | "warning" | "critical" | "unknown";
+  scope: "resource" | "workspace" | "organization" | string;
+  period: string;
+  source: string;
+  description: string | null;
+}
+
+export interface UsageSnapshot {
+  status: "ok" | "warning" | "critical" | "unknown";
+  captured_at?: string;
+  plan?: string;
+  metrics: UsageMetric[];
+  unavailable: string[];
+}
+
+export interface ProviderResourceSnapshot {
+  resource_id: string;
+  name: string;
+  environment: string;
+  captured_at: string | null;
+  snapshot: {
+    service?: { dashboard_url?: string; plan?: string; suspended?: string };
+    project?: { dashboard_url?: string; plan?: string; status?: string };
+    usage?: UsageSnapshot;
+  } | null;
+}
+
 export interface AuditLog {
   id: string;
   action: string;

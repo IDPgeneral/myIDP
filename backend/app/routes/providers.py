@@ -73,6 +73,15 @@ def render_deploys(resource_id: str, _: Annotated[CurrentUser, Depends(get_curre
     return (snapshot.payload_sanitized if snapshot else {}).get("recent_deploys", [])
 
 
+@router.get("/render/services/{resource_id}/usage")
+def render_service_usage(resource_id: str, _: Annotated[CurrentUser, Depends(get_current_user)], db: Annotated[Session, Depends(get_db)]):
+    resource = db.get(ProductResource, uuid.UUID(resource_id))
+    if resource is None or resource.resource_type != "render_service":
+        raise HTTPException(status_code=404, detail="Serviço Render não encontrado.")
+    snapshot = _latest(db, resource.id, "render_service")
+    return {"usage": (snapshot.payload_sanitized if snapshot else {}).get("usage"), "captured_at": snapshot.captured_at if snapshot else None}
+
+
 def _render_write_action(resource_id: str, action_name: str, payload: ActionConfirmation, user: CurrentUser, db: Session, settings: Settings):
     resource = db.get(ProductResource, uuid.UUID(resource_id))
     if resource is None or resource.resource_type != "render_service" or resource.provider_account_id is None:
@@ -120,9 +129,16 @@ def supabase_project_status(resource_id: str, _: Annotated[CurrentUser, Depends(
 
 
 @router.get("/supabase/projects/{resource_id}/usage")
-def supabase_project_usage(resource_id: str, user: Annotated[CurrentUser, Depends(get_current_user)], db: Annotated[Session, Depends(get_db)]):
-    data = supabase_project_status(resource_id, user, db)
-    return {"usage": data.get("usage"), "message": "Métricas são exibidas somente quando disponíveis no snapshot."}
+def supabase_project_usage(resource_id: str, _: Annotated[CurrentUser, Depends(get_current_user)], db: Annotated[Session, Depends(get_db)]):
+    resource = db.get(ProductResource, uuid.UUID(resource_id))
+    if resource is None or resource.resource_type != "supabase_project":
+        raise HTTPException(status_code=404, detail="Projeto Supabase não encontrado.")
+    snapshot = _latest(db, resource.id, "supabase_project")
+    return {
+        "usage": (snapshot.payload_sanitized if snapshot else {}).get("usage"),
+        "captured_at": snapshot.captured_at if snapshot else None,
+        "message": "Métricas são exibidas somente quando disponíveis no snapshot.",
+    }
 
 
 @router.get("/audit-logs")

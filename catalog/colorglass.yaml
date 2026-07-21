@@ -21,13 +21,16 @@ spec:
       services:
         - name: frontend
           serviceId: REPLACE_ME
+          plan: free
         - name: backend
           serviceId: REPLACE_ME
+          plan: free
     supabase:
       connection: supabase-colorglass
       projects:
         - name: main
           projectRef: REPLACE_ME
+          plan: free
   healthChecks:
     - name: backend
       url: https://example.com/REPLACE_ME/health

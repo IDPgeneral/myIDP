@@ -139,14 +139,18 @@ class SyncCoordinator:
                 payload = client.repository_snapshot(resource.external_id)
                 self._snapshot(resource, "github", "github_repository", payload, "healthy")
             elif account.provider == "render" and resource.resource_type == "render_service":
-                payload = client.service_snapshot(resource.external_id)
+                payload = client.service_snapshot(resource.external_id, plan=str(resource.metadata_json.get("plan") or "unknown"))
                 deploy_status = str((payload.get("last_deploy") or {}).get("status") or "unknown")
                 status_value = "healthy" if deploy_status in {"live", "succeeded", "success"} else "degraded" if deploy_status != "unknown" else "unknown"
+                if (payload.get("usage") or {}).get("status") == "critical":
+                    status_value = "degraded"
                 self._snapshot(resource, "render", "render_service", payload, status_value)
             elif account.provider == "supabase" and resource.resource_type == "supabase_project":
-                payload = client.project_snapshot(resource.external_id)
+                payload = client.project_snapshot(resource.external_id, plan=str(resource.metadata_json.get("plan") or "unknown"))
                 project_status = str((payload.get("project") or {}).get("status") or "unknown").upper()
                 status_value = "healthy" if project_status in {"ACTIVE_HEALTHY", "ACTIVE"} else "degraded"
+                if (payload.get("usage") or {}).get("status") == "critical":
+                    status_value = "degraded"
                 self._snapshot(resource, "supabase", "supabase_project", payload, status_value)
             else:
                 return self._finish(run, "skipped", "Tipo de recurso incompatível com o provedor.")
