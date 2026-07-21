@@ -19,6 +19,12 @@ services:
         sync: false
       - key: CORS_ORIGINS
         sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: ALLOWED_ADMIN_EMAILS
+        sync: false
       - key: GITHUB_APP_ID
         sync: false
       - key: GITHUB_APP_PRIVATE_KEY
@@ -54,4 +60,8 @@ services:
     autoDeployTrigger: checksPass
     envVars:
       - key: NEXT_PUBLIC_BACKEND_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
         sync: false
