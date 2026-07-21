@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql://postgres:postgres@localhost:5432/idp"
 
     supabase_url: str = ""
+    supabase_publishable_key: str = ""
     supabase_anon_key: str = ""
     supabase_jwt_secret: str = ""
     auth_disabled: bool = True
