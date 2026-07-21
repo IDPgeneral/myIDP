@@ -67,7 +67,8 @@ class Settings(BaseSettings):
 
     @property
     def cors_origin_list(self) -> list[str]:
-        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+        origins = [*self.cors_origins.split(","), self.frontend_url]
+        return list(dict.fromkeys(origin.strip().rstrip("/") for origin in origins if origin.strip()))
 
     @property
     def normalized_github_private_key(self) -> str:

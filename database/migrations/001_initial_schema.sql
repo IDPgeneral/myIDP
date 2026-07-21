@@ -146,4 +146,15 @@ CREATE INDEX IF NOT EXISTS ix_health_check_results_check_created ON health_check
 CREATE INDEX IF NOT EXISTS ix_resource_snapshots_resource_captured ON resource_snapshots(resource_id, captured_at DESC);
 CREATE INDEX IF NOT EXISTS ix_audit_logs_created_at ON audit_logs(created_at DESC);
 
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE product_environments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE provider_accounts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE product_resources ENABLE ROW LEVEL SECURITY;
+ALTER TABLE health_checks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE health_check_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sync_runs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE resource_snapshots ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
 COMMIT;
