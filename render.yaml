@@ -9,6 +9,8 @@ services:
     envVars:
       - key: APP_ENV
         value: production
+      - key: AUTH_DISABLED
+        value: "true"
       - key: DATABASE_URL
         sync: false
       - key: FRONTEND_URL
@@ -16,14 +18,6 @@ services:
       - key: BACKEND_URL
         sync: false
       - key: CORS_ORIGINS
-        sync: false
-      - key: SUPABASE_URL
-        sync: false
-      - key: SUPABASE_ANON_KEY
-        sync: false
-      - key: SUPABASE_JWT_SECRET
-        sync: false
-      - key: ALLOWED_ADMIN_EMAILS
         sync: false
       - key: GITHUB_APP_ID
         sync: false
@@ -60,8 +54,4 @@ services:
     autoDeployTrigger: checksPass
     envVars:
       - key: NEXT_PUBLIC_BACKEND_URL
-        sync: false
-      - key: NEXT_PUBLIC_SUPABASE_URL
-        sync: false
-      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
         sync: false

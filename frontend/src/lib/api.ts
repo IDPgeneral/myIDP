@@ -15,7 +15,7 @@ export async function apiFetch<T>(token: string, path: string, init?: RequestIni
     ...init,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },
     cache: "no-store",

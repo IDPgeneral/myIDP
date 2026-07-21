@@ -66,6 +66,11 @@ def get_current_user(
     if settings.app_env == "test" and x_idp_test_email:
         return CurrentUser(id="00000000-0000-0000-0000-000000000001", email=x_idp_test_email, role=x_idp_test_role or "viewer")
 
+    if settings.auth_disabled:
+        user = CurrentUser(id="public", email="acesso-direto", role="admin", display_name="Acesso direto")
+        request.state.current_user = user
+        return user
+
     if credentials is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Autenticação obrigatória.")
 

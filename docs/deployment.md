@@ -7,10 +7,7 @@ Crie um projeto exclusivo para o portal.
 Configure:
 
 - PostgreSQL;
-- Supabase Auth;
-- provider Google;
-- redirect URL do frontend Render em `/auth/callback`;
-- URL local de desenvolvimento.
+- acesso ao banco pelo backend.
 
 Aplique:
 
@@ -31,10 +28,7 @@ Variáveis obrigatórias:
 - `DATABASE_URL`;
 - `FRONTEND_URL`;
 - `BACKEND_URL`;
-- `SUPABASE_URL`;
-- `SUPABASE_ANON_KEY`;
-- `SUPABASE_JWT_SECRET`;
-- `ALLOWED_ADMIN_EMAILS`;
+- `AUTH_DISABLED=true`;
 - `CORS_ORIGINS`;
 - GitHub App e três installation IDs;
 - três Render API keys;
@@ -48,13 +42,11 @@ Health check do Render: `/healthz`.
 
 O serviço `idp-frontend` usa `frontend/Dockerfile`.
 
-Variáveis públicas:
+Variável pública:
 
-- `NEXT_PUBLIC_BACKEND_URL`;
-- `NEXT_PUBLIC_SUPABASE_URL`;
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- `NEXT_PUBLIC_BACKEND_URL`.
 
-Essas variáveis não são credenciais administrativas. Não configure keys Render, tokens Management ou private key GitHub no frontend.
+O portal abre diretamente, sem login. Não configure keys Render, tokens Management ou private key GitHub no frontend.
 
 ## 4. Catálogo
 
@@ -94,7 +86,7 @@ Frontend/backend são stateless. Reverta o deploy no Render para a imagem anteri
 
 ## 7. Pós-deploy
 
-- testar login Google;
+- confirmar que `/login` redireciona para `/`;
 - testar as nove conexões;
 - importar catálogo;
 - executar sincronização geral;

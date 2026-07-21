@@ -5,7 +5,6 @@
 ```mermaid
 flowchart LR
     U[Usuário interno] --> F[Next.js]
-    F --> A[Supabase Auth]
     F --> B[FastAPI IDP]
     B --> D[(PostgreSQL IDP)]
     B --> P[Provider Account]
@@ -20,7 +19,7 @@ flowchart LR
 ```text
 Frontend
 -> backend do IDP
--> valida usuário e papel
+-> atribui o papel administrativo de acesso direto
 -> carrega ProductResource
 -> valida product_id + provider_account_id + resource_id + environment
 -> resolve credential_ref no ambiente
@@ -35,7 +34,7 @@ Frontend
 O IDP é um quarto sistema. Ele não é módulo de MILU, ColorGlass ou Super Excel. Possui:
 
 - banco exclusivo;
-- autenticação exclusiva;
+- acesso direto sem provedor de autenticação;
 - frontend e backend próprios;
 - credenciais próprias para consultar cada conta externa;
 - deploy independente.
@@ -73,7 +72,7 @@ O estado do produto considera:
 - último workflow GitHub;
 - existência de snapshots.
 
-A falha de autenticação do IDP não é tratada como serviço fora do ar.
+Falhas de autenticação dos provedores externos são tratadas separadamente do estado do IDP.
 
 ## Concorrência
 

@@ -19,7 +19,7 @@ const links = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { session, user, signOut } = useAuth();
+  const { session } = useAuth();
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
 
@@ -45,7 +45,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav aria-label="Navegação principal">
           {links.map(([href, label]) => <Link key={href} href={href} className={pathname === href || (href !== "/" && pathname.startsWith(href)) ? "active" : ""}>{label}</Link>)}
         </nav>
-        <div className="sidebar-footer"><small>Autenticado como</small><strong>{user?.email ?? "—"}</strong><button className="text-button" onClick={() => void signOut()}>Sair</button></div>
+        <div className="sidebar-footer"><small>Acesso</small><strong>Direto, sem login</strong></div>
       </aside>
       <div className="workspace">
         <header className="topbar">

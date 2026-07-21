@@ -25,33 +25,17 @@ Nunca armazenar no banco, YAML, logs ou frontend:
 
 A resolução de credenciais recebe um `ProviderAccount` já validado. O recurso precisa estar vinculado à mesma conta e produto. O código não procura uma credencial por nome de projeto, nome de serviço ou slug externo.
 
-## Autenticação
+## Acesso direto
 
-- login Google via Supabase Auth;
-- sessão enviada como Bearer token;
-- backend valida assinatura, expiração, audience e subject;
-- e-mail precisa existir na allowlist interna;
-- rotas administrativas exigem papel Admin.
+- não existe tela de login ou sessão no frontend;
+- o backend usa um ator interno sem vínculo com a tabela `users`;
+- o ator de acesso direto recebe papel Admin;
+- `AUTH_DISABLED=false` desativa esse modo e volta a exigir o fluxo JWT legado do backend;
+- como o domínio Render é público, conhecer a URL é suficiente para acessar o portal.
 
 ## Permissões
 
-Viewer:
-
-- leitura;
-- documentação;
-- sincronização manual;
-- health check manual.
-
-Admin:
-
-- tudo do Viewer;
-- catálogo;
-- conexões;
-- usuários autorizados;
-- teste de conexão;
-- deploy e restart Render com confirmação.
-
-A autorização é sempre executada no backend.
+O ator direto pode ler, sincronizar, validar catálogo, testar conexões e executar as ações administrativas existentes. Deploy e restart Render continuam exigindo o body de confirmação explícita.
 
 ## Sanitização
 

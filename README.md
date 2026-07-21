@@ -12,7 +12,7 @@ O IDP centraliza snapshots de GitHub, Render, Supabase e health checks sem compa
 
 ```text
 Browser
-  -> Next.js + Supabase Auth
+  -> Next.js em acesso direto
   -> FastAPI IDP
   -> ProviderAccount do produto
   -> credencial resolvida pela referência
@@ -35,7 +35,7 @@ O backend nunca escolhe credenciais apenas pelo nome de um recurso.
 
 - Frontend: Next.js 16, React 19, TypeScript, App Router
 - Backend: FastAPI, Python 3.13, Pydantic, SQLAlchemy
-- Banco e autenticação: Supabase/PostgreSQL e Supabase Auth
+- Banco: Supabase/PostgreSQL
 - Agendamento: APScheduler
 - Deploy: Render
 - CI: GitHub Actions
@@ -60,7 +60,6 @@ developer-portal/
 - Node.js 22+ (imagem de produção fixada em Node.js 24.14)
 - PostgreSQL 15+
 - Projeto Supabase exclusivo do IDP
-- Google OAuth habilitado no Supabase Auth
 - GitHub App instalado nas três contas GitHub
 - Três API keys Render
 - Três tokens de Management API do Supabase
@@ -106,14 +105,11 @@ npm run dev
 
 6. Acesse `http://localhost:3000`.
 
-## Autenticação
+## Acesso
 
-O frontend inicia o login Google pelo Supabase Auth. O access token é enviado ao backend no header `Authorization`. O backend valida o JWT e autoriza o e-mail por uma destas formas:
+O portal abre diretamente, sem login, e o backend atribui às requisições o papel administrativo interno. Esse modo é controlado por `AUTH_DISABLED=true`; para reativar a autenticação futuramente, altere para `false` e restaure a configuração Supabase Auth no frontend.
 
-- usuário ativo na tabela `users`;
-- e-mail presente em `ALLOWED_ADMIN_EMAILS`, usado para bootstrap de administradores.
-
-Viewer pode visualizar e sincronizar. Admin pode testar conexões, editar catálogo, gerenciar usuários e executar deploy/restart com confirmação.
+O endereço do Render é público. Mesmo sem exibir segredos, qualquer pessoa que conhecer a URL poderá consultar o painel e acionar operações disponíveis.
 
 ## Integração das nove contas
 
@@ -166,7 +162,7 @@ Ative com `SYNC_ENABLED=true`. Uma falha em uma conta é registrada e não inter
 - secrets somente nas variáveis do backend;
 - referências de credencial no banco;
 - CORS restrito;
-- autenticação obrigatória nas rotas `/api`;
+- acesso direto às rotas `/api` enquanto `AUTH_DISABLED=true`;
 - rate limit em memória por instância;
 - correlation ID;
 - payloads e erros sanitizados;
@@ -206,7 +202,7 @@ O `render.yaml` define dois serviços Docker:
 - `idp-backend`;
 - `idp-frontend`.
 
-O banco e Auth permanecem no projeto Supabase exclusivo do IDP. Antes do primeiro deploy, aplique as migrations e configure todas as variáveis secretas no serviço backend.
+O banco permanece no projeto Supabase exclusivo do IDP. Antes do primeiro deploy, aplique as migrations e configure todas as variáveis secretas no serviço backend.
 
 Leia `docs/deployment.md`.
 
@@ -216,6 +212,6 @@ Leia `docs/deployment.md`.
 - contagens de issues e PRs usam a primeira página de até 100 itens;
 - rate limit é local a cada instância Render;
 - scheduler APScheduler pressupõe uma única instância ativa do backend no MVP;
-- JWT Supabase está configurado para `SUPABASE_JWT_SECRET` HS256;
+- o modo sem login torna o painel acessível a qualquer pessoa que conheça a URL pública;
 - o catálogo inicial contém placeholders e recursos ficam inativos até serem substituídos;
 - não há ações destrutivas, SQL arbitrário, editor de secrets ou aplicação automática de migrations.
