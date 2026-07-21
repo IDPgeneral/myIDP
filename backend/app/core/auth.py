@@ -3,9 +3,11 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from functools import lru_cache
 from typing import Annotated
 
 import jwt
+from jwt import PyJWKClient
 from fastapi import Depends, Header, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
@@ -40,17 +42,35 @@ def _audit_login(db: Session, user: User | None, success: bool, error: str | Non
     db.commit()
 
 
+@lru_cache(maxsize=4)
+def _supabase_jwks_client(supabase_url: str) -> PyJWKClient:
+    return PyJWKClient(f"{supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json", lifespan=600)
+
+
 def _decode_supabase_token(token: str, settings: Settings) -> dict:
-    if not settings.supabase_jwt_secret:
-        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Autenticação do IDP não configurada.")
     try:
-        return jwt.decode(
-            token,
-            settings.supabase_jwt_secret,
-            algorithms=["HS256"],
-            audience="authenticated",
-            options={"require": ["exp", "sub"]},
-        )
+        if settings.supabase_url:
+            issuer = f"{settings.supabase_url.rstrip('/')}/auth/v1"
+            signing_key = _supabase_jwks_client(settings.supabase_url).get_signing_key_from_jwt(token)
+            return jwt.decode(
+                token,
+                signing_key.key,
+                algorithms=["ES256", "RS256"],
+                audience="authenticated",
+                issuer=issuer,
+                options={"require": ["exp", "sub", "iss", "aud"]},
+            )
+        if settings.supabase_jwt_secret:
+            return jwt.decode(
+                token,
+                settings.supabase_jwt_secret,
+                algorithms=["HS256"],
+                audience="authenticated",
+                options={"require": ["exp", "sub"]},
+            )
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Autenticação do IDP não configurada.")
+    except HTTPException:
+        raise
     except jwt.PyJWTError as exc:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sessão inválida ou expirada.") from exc
 
