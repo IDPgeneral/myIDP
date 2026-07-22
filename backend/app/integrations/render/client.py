@@ -39,6 +39,35 @@ class RenderClient:
         data = self._request("GET", "/services", params={"limit": 1})
         return {"reachable": True, "sample_count": len(data) if isinstance(data, list) else 1}
 
+    def retrieve_service(self, service_id: str) -> dict[str, Any] | list[Any]:
+        return self._request("GET", f"/services/{service_id}")
+
+    def list_deploys(self, service_id: str, *, limit: int = 10) -> dict[str, Any] | list[Any]:
+        return self._request("GET", f"/services/{service_id}/deploys", params={"limit": min(max(limit, 1), 20)})
+
+    def list_logs(
+        self,
+        *,
+        owner_id: str,
+        service_id: str,
+        start_time: datetime,
+        end_time: datetime,
+        limit: int = 100,
+        text: str | None = None,
+    ) -> dict[str, Any] | list[Any]:
+        params: dict[str, Any] = {
+            "ownerId": owner_id,
+            "resource": [service_id],
+            "startTime": start_time.astimezone(UTC).isoformat().replace("+00:00", "Z"),
+            "endTime": end_time.astimezone(UTC).isoformat().replace("+00:00", "Z"),
+            "direction": "forward",
+            "type": ["build"],
+            "limit": min(max(limit, 1), 100),
+        }
+        if text:
+            params["text"] = [text]
+        return self._request("GET", "/logs", params=params)
+
     def _service_usage(self, service_id: str, plan: str | None) -> dict[str, Any]:
         now = datetime.now(UTC)
         params = {

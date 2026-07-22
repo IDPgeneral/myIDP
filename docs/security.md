@@ -69,6 +69,16 @@ Erros enviados ao frontend são resumidos e limitados a 500 caracteres.
 - métodos CORS limitados;
 - health endpoint público mínimo em `/healthz`.
 
+## MCP de logs
+
+- desativado por padrão;
+- OAuth 2.1 emitido pelo Supabase do IDP;
+- acesso limitado aos e-mails administrativos configurados;
+- somente três ferramentas de leitura;
+- nenhum Service ID ou credential ref aceito diretamente do cliente;
+- logs limitados, sanitizados e marcados como conteúdo não confiável;
+- nenhuma chave OpenAI no backend.
+
 ## Ações proibidas
 
 O MVP não permite:

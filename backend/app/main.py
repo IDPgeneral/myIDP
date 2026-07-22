@@ -13,12 +13,15 @@ from app.core.config import get_settings
 from app.core.logging import CorrelationIdMiddleware, configure_logging
 from app.core.rate_limit import RateLimitMiddleware
 from app.db.session import SessionLocal
+from app.mcp.server import build_mcp_server
 from app.routes import catalog, health, products, provider_accounts, providers, sync, users
 from app.sync.scheduler import build_scheduler
 
 settings = get_settings()
 configure_logging()
 scheduler = None
+mcp_server = build_mcp_server(settings) if settings.mcp_enabled else None
+mcp_http_app = mcp_server.streamable_http_app() if mcp_server else None
 
 
 def _database_mode() -> str:
@@ -55,9 +58,15 @@ async def lifespan(_: FastAPI):
     if settings.sync_enabled:
         scheduler = build_scheduler(settings)
         scheduler.start()
-    yield
-    if scheduler:
-        scheduler.shutdown(wait=False)
+    try:
+        if mcp_server:
+            async with mcp_server.session_manager.run():
+                yield
+        else:
+            yield
+    finally:
+        if scheduler:
+            scheduler.shutdown(wait=False)
 
 
 app = FastAPI(title=settings.app_name, version="0.1.0", lifespan=lifespan)
@@ -67,13 +76,13 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"] if settings.auth_disabled else settings.cors_origin_list,
     allow_credentials=not settings.auth_disabled,
-    allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-Correlation-ID"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Correlation-ID", "MCP-Protocol-Version", "Mcp-Session-Id", "Last-Event-ID"],
+    expose_headers=["Mcp-Session-Id", "X-Correlation-ID"],
 )
 
 for router in (products.router, provider_accounts.router, sync.router, providers.router, health.router, catalog.router, users.router):
     app.include_router(router, prefix=settings.api_prefix)
-
 
 @app.get("/healthz", include_in_schema=False)
 def healthz():
@@ -85,6 +94,11 @@ def healthz():
             "auth_configured": bool(settings.supabase_url or settings.supabase_jwt_secret),
             "sync_enabled": settings.sync_enabled,
             "scheduler_running": bool(scheduler and scheduler.running),
+            "mcp": {
+                "enabled": settings.mcp_enabled,
+                "oauth_configured": bool(settings.supabase_url and settings.admin_email_set),
+                "read_only": True,
+            },
             "render_credentials": {
                 "milu": bool(os.getenv("RENDER_API_KEY_MILU")),
                 "colorglass": bool(os.getenv("RENDER_API_KEY_COLORGLASS")),
@@ -124,3 +138,9 @@ def database_error_handler(_, exc: SQLAlchemyError):
 @app.exception_handler(ValueError)
 def value_error_handler(_, exc: ValueError):
     return JSONResponse(status_code=422, content={"detail": str(exc)[:500]})
+
+
+if mcp_http_app:
+    # Mount last so the SDK can serve /mcp and RFC 9728 metadata without
+    # shadowing the backend's health checks or API routes.
+    app.mount("/", mcp_http_app)

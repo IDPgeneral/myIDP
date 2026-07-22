@@ -144,6 +144,11 @@ th { color: var(--muted); font-size: .75rem; text-transform: uppercase; letter-s
 .login-card { width: min(440px, 100%); padding: 34px; border: 1px solid var(--line); border-radius: 18px; background: white; box-shadow: 0 22px 80px rgba(24, 46, 92, .12); }
 .login-card h1 { margin: 6px 0 10px; }
 .login-card p { color: var(--muted); line-height: 1.55; }
+.consent-card { width: min(520px, 100%); }
+.consent-details { margin: 22px 0; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: #f8faff; }
+.consent-details ul { margin: 10px 0; padding-left: 22px; }
+.consent-details small { color: var(--muted); line-height: 1.5; }
+.consent-actions { display: flex; gap: 10px; }
 .form-error { color: var(--down) !important; }
 @media (max-width: 1100px) { .product-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) {
