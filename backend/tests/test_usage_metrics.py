@@ -29,8 +29,10 @@ def test_render_series_normalization():
 
 def test_render_usage_is_best_effort_and_marks_free_workspace_quota(monkeypatch):
     client = RenderClient(Settings(app_env="test", database_url="sqlite://"), "token")
+    request_params = []
 
     def fake_request(method, path, **kwargs):
+        request_params.append(kwargs["params"])
         values = {
             "/metrics/cpu": 0.8,
             "/metrics/cpu-limit": 1,
@@ -49,6 +51,10 @@ def test_render_usage_is_best_effort_and_marks_free_workspace_quota(monkeypatch)
     hours = next(metric for metric in usage["metrics"] if metric["key"] == "free_instance_hours")
     assert hours["limit"] == 750
     assert hours["scope"] == "workspace"
+    assert len(request_params) == 7
+    assert all(params["resource"] == "srv-test" for params in request_params)
+    assert all(isinstance(params["startTime"], str) and params["startTime"].endswith("Z") for params in request_params)
+    assert all(isinstance(params["endTime"], str) and params["endTime"].endswith("Z") for params in request_params)
 
 
 def test_supabase_free_quotas_use_read_only_sizes(monkeypatch):
