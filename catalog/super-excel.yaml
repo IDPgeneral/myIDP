@@ -7,14 +7,14 @@ metadata:
   description: Portal operacional do produto Super Excel
 
 spec:
-  owner: REPLACE_ME
+  owner: excellaratordev
   lifecycle: production
   providers:
     github:
       connection: github-superexcel
       repositories:
-        - name: repository-placeholder
-          fullName: REPLACE_ME
+        - name: excel
+          fullName: excellaratordev/excel
           defaultBranch: main
     render:
       connection: render-superexcel
