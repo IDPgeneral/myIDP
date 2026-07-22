@@ -20,10 +20,10 @@ spec:
       connection: render-milu
       services:
         - name: frontend
-          serviceId: REPLACE_ME
+          serviceId: srv-d8pf64jtqb8s7384kug0
           plan: free
         - name: backend
-          serviceId: REPLACE_ME
+          serviceId: srv-d8pdrva8qa3s73bpjudg
           plan: free
     supabase:
       connection: supabase-milu
