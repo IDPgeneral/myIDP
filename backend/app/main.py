@@ -10,15 +10,43 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import get_settings
+from app.db.session import SessionLocal
 from app.core.logging import CorrelationIdMiddleware, configure_logging
 from app.core.rate_limit import RateLimitMiddleware
-from app.db.session import SessionLocal
 from app.routes import catalog, health, products, provider_accounts, providers, sync, users
 from app.sync.scheduler import build_scheduler
 
 settings = get_settings()
 configure_logging()
 scheduler = None
+
+
+def _database_mode() -> str:
+    database_url = settings.database_url.lower()
+    if "localhost" in database_url:
+        return "default_local"
+    if ".pooler.supabase.com" in database_url and ":5432" in database_url:
+        return "session_pooler"
+    if ".pooler.supabase.com" in database_url and ":6543" in database_url:
+        return "transaction_pooler"
+    if ".supabase.co" in database_url:
+        return "direct"
+    return "custom"
+
+
+def _database_error_category(exc: SQLAlchemyError) -> str:
+    message = str(getattr(exc, "orig", exc)).lower()
+    if "password authentication failed" in message or "authentication failed" in message:
+        return "invalid_credentials"
+    if "name or service not known" in message or "could not translate host name" in message:
+        return "dns_error"
+    if "network is unreachable" in message:
+        return "network_unreachable"
+    if "connection refused" in message:
+        return "connection_refused"
+    if "timeout" in message:
+        return "connection_timeout"
+    return "connection_failed"
 
 
 @asynccontextmanager
@@ -74,9 +102,15 @@ def readyz():
     except SQLAlchemyError as exc:
         return JSONResponse(
             status_code=503,
-            content={"status": "not_ready", "database": False, "error_type": type(exc).__name__},
+            content={
+                "status": "not_ready",
+                "database": False,
+                "database_mode": _database_mode(),
+                "error_type": type(exc).__name__,
+                "error_category": _database_error_category(exc),
+            },
         )
-    return {"status": "ready", "database": True}
+    return {"status": "ready", "database": True, "database_mode": _database_mode()}
 
 
 @app.exception_handler(SQLAlchemyError)
