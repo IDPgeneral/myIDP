@@ -147,8 +147,20 @@ class RenderClient:
             "usage": self._service_usage(service_id, detected_plan),
         }
 
-    def trigger_deploy(self, service_id: str) -> dict[str, Any] | list[Any]:
-        return self._request("POST", f"/services/{service_id}/deploys", json={"clearCache": "do_not_clear"})
+    def trigger_deploy(
+        self,
+        service_id: str,
+        *,
+        commit_id: str | None = None,
+        clear_cache: bool = False,
+    ) -> dict[str, Any] | list[Any]:
+        payload = {"clearCache": "clear" if clear_cache else "do_not_clear"}
+        if commit_id:
+            payload["commitId"] = commit_id
+        return self._request("POST", f"/services/{service_id}/deploys", json=payload)
+
+    def retrieve_deploy(self, service_id: str, deploy_id: str) -> dict[str, Any] | list[Any]:
+        return self._request("GET", f"/services/{service_id}/deploys/{deploy_id}")
 
     def restart_service(self, service_id: str) -> dict[str, Any] | list[Any]:
         return self._request("POST", f"/services/{service_id}/restart")

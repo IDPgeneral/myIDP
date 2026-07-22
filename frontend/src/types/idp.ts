@@ -102,10 +102,20 @@ export interface ProviderResourceSnapshot {
   environment: string;
   captured_at: string | null;
   snapshot: {
-    service?: { dashboard_url?: string; plan?: string; suspended?: string };
+    service?: { dashboard_url?: string; plan?: string; suspended?: string; branch?: string; url?: string };
     project?: { dashboard_url?: string; plan?: string; status?: string };
+    last_deploy?: RenderDeploy;
+    recent_deploys?: RenderDeploy[];
     usage?: UsageSnapshot;
   } | null;
+}
+
+export interface RenderDeploy {
+  id?: string;
+  status?: string;
+  commit?: { id?: string; message?: string } | string | null;
+  created_at?: string;
+  finished_at?: string | null;
 }
 
 export interface AuditLog {

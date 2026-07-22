@@ -10,9 +10,9 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import get_settings
-from app.db.session import SessionLocal
 from app.core.logging import CorrelationIdMiddleware, configure_logging
 from app.core.rate_limit import RateLimitMiddleware
+from app.db.session import SessionLocal
 from app.routes import catalog, health, products, provider_accounts, providers, sync, users
 from app.sync.scheduler import build_scheduler
 
