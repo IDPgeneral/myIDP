@@ -29,7 +29,7 @@ spec:
       connection: supabase-milu
       projects:
         - name: main
-          projectRef: REPLACE_ME
+          projectRef: nelghihwaquqoslmakbr
           plan: free
   healthChecks:
     - name: backend
