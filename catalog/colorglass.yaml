@@ -29,7 +29,7 @@ spec:
       connection: supabase-colorglass
       projects:
         - name: main
-          projectRef: REPLACE_ME
+          projectRef: hfhwvzldhgqniqnurync
           plan: free
   healthChecks:
     - name: backend
