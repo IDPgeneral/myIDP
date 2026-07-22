@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC, datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import select
@@ -39,6 +40,15 @@ def build_scheduler(settings: Settings) -> BackgroundScheduler:
     scheduler = BackgroundScheduler(timezone="UTC")
     scheduler.add_job(_sync_health, "interval", minutes=settings.sync_health_interval_minutes, id="health", max_instances=1, coalesce=True)
     scheduler.add_job(_sync_provider, "interval", minutes=settings.sync_github_interval_minutes, id="github", args=["github", settings], max_instances=1, coalesce=True)
-    scheduler.add_job(_sync_provider, "interval", minutes=settings.sync_render_interval_minutes, id="render", args=["render", settings], max_instances=1, coalesce=True)
+    scheduler.add_job(
+        _sync_provider,
+        "interval",
+        minutes=settings.sync_render_interval_minutes,
+        id="render",
+        args=["render", settings],
+        max_instances=1,
+        coalesce=True,
+        next_run_time=datetime.now(UTC),
+    )
     scheduler.add_job(_sync_provider, "interval", minutes=settings.sync_supabase_interval_minutes, id="supabase", args=["supabase", settings], max_instances=1, coalesce=True)
     return scheduler
