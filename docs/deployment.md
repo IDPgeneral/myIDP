@@ -38,6 +38,12 @@ Ative `SYNC_ENABLED=true` somente quando houver uma única instância do schedul
 
 Health check do Render: `/healthz`.
 
+### MCP de logs
+
+O deploy inicial deve manter `MCP_ENABLED=false`. Depois de validar o backend e habilitar o OAuth 2.1 Server no Supabase do IDP, configure `MCP_RESOURCE_URL` com a URL HTTPS terminada em `/mcp` e somente então altere `MCP_ENABLED=true`.
+
+O MCP usa as Render API keys já cadastradas; não adicione chave OpenAI.
+
 ## 3. Frontend Render
 
 O serviço `idp-frontend` usa `frontend/Dockerfile`.

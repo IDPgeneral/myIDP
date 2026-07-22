@@ -47,6 +47,12 @@ class Settings(BaseSettings):
     health_default_timeout_seconds: float = 8.0
     catalog_directory: str = "../catalog"
 
+    # The MCP endpoint is intentionally opt-in. It is mounted only after OAuth
+    # has been configured in the IDP's Supabase project.
+    mcp_enabled: bool = False
+    mcp_resource_url: str = ""
+    mcp_max_log_lines: int = 100
+
     @field_validator("database_url", mode="before")
     @classmethod
     def normalize_database_url(cls, value: object) -> object:
@@ -78,6 +84,17 @@ class Settings(BaseSettings):
     @property
     def normalized_github_private_key(self) -> str:
         return self.github_app_private_key.replace("\\n", "\n")
+
+    @property
+    def effective_mcp_resource_url(self) -> str:
+        configured = self.mcp_resource_url.strip().rstrip("/")
+        if configured:
+            return configured
+        return f"{self.backend_url.strip().rstrip('/')}/mcp"
+
+    @property
+    def supabase_auth_issuer(self) -> str:
+        return f"{self.supabase_url.strip().rstrip('/')}/auth/v1"
 
 
 @lru_cache(maxsize=1)

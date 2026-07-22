@@ -47,6 +47,8 @@ services:
         sync: false
       - key: SUPABASE_MANAGEMENT_TOKEN_SUPEREXCEL
         sync: false
+      - key: MCP_ENABLED
+        value: "false"
       - key: SYNC_ENABLED
         value: "true"
       - key: CATALOG_DIRECTORY

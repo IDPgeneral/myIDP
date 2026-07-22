@@ -157,6 +157,12 @@ Intervalos padrão:
 
 Ative com `SYNC_ENABLED=true`. Uma falha em uma conta é registrada e não interrompe os outros produtos.
 
+## ChatGPT MCP para logs de deploy
+
+O backend inclui um MCP opcional e estritamente somente leitura para o ChatGPT consultar deploys e logs de build do Render. Ele publica apenas `list_products`, `list_deploys` e `get_deploy_logs`, permanece desativado por padrão e usa o OAuth 2.1 do Supabase do IDP.
+
+Não configure `OPENAI_API_KEY`: o modelo roda no ChatGPT, enquanto o backend somente entrega dados autorizados. Consulte `docs/mcp-deploy-logs.md` antes de habilitar `MCP_ENABLED`.
+
 ## Segurança
 
 - secrets somente nas variáveis do backend;

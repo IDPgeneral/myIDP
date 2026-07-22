@@ -48,8 +48,21 @@ def sanitize_payload(value: Any) -> Any:
     if isinstance(value, tuple):
         return tuple(sanitize_payload(item) for item in value)
     if isinstance(value, str):
+        value = re.sub(
+            r"-----BEGIN [A-Z0-9 ]*(?:PRIVATE KEY|CERTIFICATE)-----.*?-----END [A-Z0-9 ]*(?:PRIVATE KEY|CERTIFICATE)-----",
+            "[REDACTED_PEM]",
+            value,
+            flags=re.I | re.S,
+        )
         value = re.sub(r"Bearer\s+[A-Za-z0-9._~+/=-]+", "Bearer [REDACTED]", value, flags=re.I)
         value = re.sub(r"(postgres(?:ql)?://)[^@\s]+@", r"\1[REDACTED]@", value, flags=re.I)
+        value = re.sub(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b", "[REDACTED_JWT]", value)
+        value = re.sub(r"\b(?:rnd|gh[opsu]|github_pat)_[A-Za-z0-9_\-]{12,}\b", "[REDACTED_TOKEN]", value, flags=re.I)
+        value = re.sub(
+            r"(?i)\b(api[_-]?key|access[_-]?token|auth[_-]?token|secret|password|private[_-]?key|database[_-]?url)\b(\s*[:=]\s*)([^\s,;]+)",
+            r"\1\2[REDACTED]",
+            value,
+        )
     return value
 
 
