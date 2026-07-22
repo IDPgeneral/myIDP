@@ -43,8 +43,8 @@ class RenderClient:
         now = datetime.now(UTC)
         params = {
             "resource": service_id,
-            "startTime": int((now - timedelta(hours=24)).timestamp()),
-            "endTime": int(now.timestamp()),
+            "startTime": (now - timedelta(hours=24)).isoformat().replace("+00:00", "Z"),
+            "endTime": now.isoformat().replace("+00:00", "Z"),
             "resolutionSeconds": 900,
         }
         endpoints: dict[str, tuple[str, Literal["latest", "max", "sum"]]] = {
