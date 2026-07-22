@@ -19,11 +19,8 @@ spec:
     render:
       connection: render-superexcel
       services:
-        - name: frontend
-          serviceId: REPLACE_ME
-          plan: free
-        - name: backend
-          serviceId: REPLACE_ME
+        - name: frontend-backend
+          serviceId: srv-d9bvddm7r5hc73bjnrf0
           plan: free
     supabase:
       connection: supabase-superexcel
