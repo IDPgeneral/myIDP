@@ -35,7 +35,7 @@ Scopes obrigatórios:
 openid email
 ```
 
-A habilitação do OAuth 2.1, o authorization endpoint e o cadastro do app no ChatGPT são feitos somente depois que o código estiver publicado e o endpoint HTTPS definitivo estiver disponível.
+O frontend inclui a tela de consentimento em `/oauth/consent` e a decisão autenticada em `/api/oauth/decision`. A habilitação do OAuth 2.1, a configuração desse Authorization Path e o cadastro do app no ChatGPT são feitos somente depois que o código estiver publicado e os endpoints HTTPS definitivos estiverem disponíveis.
 
 ## Variáveis
 

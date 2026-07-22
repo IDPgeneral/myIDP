@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { safeOAuthReturnPath } from "@/lib/oauth";
 import { useAuth } from "@/components/auth-provider";
 
 export default function LoginPage() {
@@ -12,7 +13,10 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && session) router.replace("/");
+    if (!loading && session) {
+      const next = safeOAuthReturnPath(new URLSearchParams(window.location.search).get("redirect"));
+      router.replace(next);
+    }
   }, [loading, router, session]);
 
   async function login() {
@@ -21,10 +25,13 @@ export default function LoginPage() {
       setError("Supabase Auth não configurado no frontend.");
       return;
     }
+    const next = safeOAuthReturnPath(new URLSearchParams(window.location.search).get("redirect"));
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    if (next !== "/") callbackUrl.searchParams.set("next", next);
     const { error: authError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl.toString(),
         queryParams: { prompt: "select_account" },
       },
     });
