@@ -20,10 +20,10 @@ spec:
       connection: render-colorglass
       services:
         - name: frontend
-          serviceId: REPLACE_ME
+          serviceId: srv-d5n9aihr0fns73ff0ifg
           plan: free
         - name: backend
-          serviceId: REPLACE_ME
+          serviceId: srv-d566stbe5dus73cjo690
           plan: free
     supabase:
       connection: supabase-colorglass
