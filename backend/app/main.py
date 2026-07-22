@@ -53,6 +53,7 @@ def healthz():
         "configuration": {
             "auth_configured": bool(settings.supabase_url or settings.supabase_jwt_secret),
             "sync_enabled": settings.sync_enabled,
+            "scheduler_running": bool(scheduler and scheduler.running),
             "render_credentials": {
                 "milu": bool(os.getenv("RENDER_API_KEY_MILU")),
                 "colorglass": bool(os.getenv("RENDER_API_KEY_COLORGLASS")),
