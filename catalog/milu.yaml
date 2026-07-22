@@ -7,14 +7,14 @@ metadata:
   description: Portal operacional do produto MILU Software
 
 spec:
-  owner: REPLACE_ME
+  owner: ricardosiqueirarf-hash
   lifecycle: production
   providers:
     github:
       connection: github-milu
       repositories:
-        - name: repository-placeholder
-          fullName: REPLACE_ME
+        - name: ricardosiqueirarf.github.io
+          fullName: ricardosiqueirarf-hash/ricardosiqueirarf.github.io
           defaultBranch: main
     render:
       connection: render-milu
