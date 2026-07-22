@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -45,7 +46,20 @@ for router in (products.router, provider_accounts.router, sync.router, providers
 
 @app.get("/healthz", include_in_schema=False)
 def healthz():
-    return {"status": "ok", "service": "idp-backend"}
+    return {
+        "status": "ok",
+        "service": "idp-backend",
+        "revision": (os.getenv("RENDER_GIT_COMMIT") or "")[:12] or None,
+        "configuration": {
+            "auth_configured": bool(settings.supabase_url or settings.supabase_jwt_secret),
+            "sync_enabled": settings.sync_enabled,
+            "render_credentials": {
+                "milu": bool(os.getenv("RENDER_API_KEY_MILU")),
+                "colorglass": bool(os.getenv("RENDER_API_KEY_COLORGLASS")),
+                "superexcel": bool(os.getenv("RENDER_API_KEY_SUPEREXCEL")),
+            },
+        },
+    }
 
 
 @app.exception_handler(ValueError)
