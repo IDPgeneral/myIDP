@@ -6,10 +6,13 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import get_settings
 from app.core.logging import CorrelationIdMiddleware, configure_logging
 from app.core.rate_limit import RateLimitMiddleware
+from app.db.session import SessionLocal
 from app.routes import catalog, health, products, provider_accounts, providers, sync, users
 from app.sync.scheduler import build_scheduler
 
@@ -61,6 +64,27 @@ def healthz():
             },
         },
     }
+
+
+@app.get("/readyz", include_in_schema=False)
+def readyz():
+    try:
+        with SessionLocal() as db:
+            db.execute(text("select 1"))
+    except SQLAlchemyError as exc:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not_ready", "database": False, "error_type": type(exc).__name__},
+        )
+    return {"status": "ready", "database": True}
+
+
+@app.exception_handler(SQLAlchemyError)
+def database_error_handler(_, exc: SQLAlchemyError):
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Banco de dados indisponível.", "error_type": type(exc).__name__},
+    )
 
 
 @app.exception_handler(ValueError)
