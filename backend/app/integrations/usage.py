@@ -73,7 +73,7 @@ def series_value(payload: dict[str, Any] | list[Any], *, aggregation: Literal["l
             if not isinstance(point, dict):
                 continue
             raw = point.get("value")
-            if isinstance(raw, (int, float)) and not isinstance(raw, bool):
+            if isinstance(raw, int | float) and not isinstance(raw, bool):
                 values.append((str(point.get("timestamp") or ""), float(raw)))
     if not values:
         return None, unit
@@ -89,7 +89,7 @@ def find_number(payload: Any, candidate_keys: Iterable[str]) -> float | None:
     if isinstance(payload, dict):
         for key, value in payload.items():
             if str(key).lower() in candidates:
-                if isinstance(value, (int, float)) and not isinstance(value, bool):
+                if isinstance(value, int | float) and not isinstance(value, bool):
                     return float(value)
                 if isinstance(value, str):
                     try:

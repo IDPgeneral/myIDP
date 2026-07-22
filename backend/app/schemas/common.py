@@ -117,6 +117,8 @@ class SyncRunOut(ORMModel):
 
 class ActionConfirmation(BaseModel):
     confirmation: Literal["CONFIRMAR"]
+    commit_id: str | None = Field(default=None, pattern=r"^[0-9a-fA-F]{7,40}$")
+    clear_cache: bool = False
 
 
 class MessageResponse(BaseModel):

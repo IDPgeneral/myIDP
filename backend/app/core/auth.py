@@ -7,9 +7,9 @@ from functools import lru_cache
 from typing import Annotated
 
 import jwt
-from jwt import PyJWKClient
 from fastapi import Depends, Header, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jwt import PyJWKClient
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 

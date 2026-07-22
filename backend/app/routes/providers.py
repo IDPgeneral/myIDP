@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
@@ -91,8 +91,30 @@ def _render_write_action(resource_id: str, action_name: str, payload: ActionConf
         raise HTTPException(status_code=409, detail="Vínculo Render inválido.")
     try:
         client = RenderClient(settings, CredentialResolver().resolve(account))
-        result = client.trigger_deploy(resource.external_id) if action_name == "deploy" else client.restart_service(resource.external_id)
-        audit(db, action=f"render.{action_name}", user=user, product_id=str(resource.product_id), provider_account_id=str(account.id), resource_id=resource_id, after_data={"confirmation": payload.confirmation, "provider_response": result}, success=True)
+        result = (
+            client.trigger_deploy(
+                resource.external_id,
+                commit_id=payload.commit_id,
+                clear_cache=payload.clear_cache,
+            )
+            if action_name == "deploy"
+            else client.restart_service(resource.external_id)
+        )
+        audit(
+            db,
+            action=f"render.{action_name}",
+            user=user,
+            product_id=str(resource.product_id),
+            provider_account_id=str(account.id),
+            resource_id=resource_id,
+            after_data={
+                "confirmation": payload.confirmation,
+                "commit_id": payload.commit_id,
+                "clear_cache": payload.clear_cache,
+                "provider_response": result,
+            },
+            success=True,
+        )
         return {"status": "accepted", "result": result}
     except Exception as exc:
         error = sanitized_error(exc)
@@ -108,6 +130,27 @@ def trigger_render_deploy(resource_id: str, payload: ActionConfirmation, user: A
 @router.post("/render/services/{resource_id}/restart")
 def restart_render_service(resource_id: str, payload: ActionConfirmation, user: Annotated[CurrentUser, Depends(require_roles("admin"))], db: Annotated[Session, Depends(get_db)], settings: Annotated[Settings, Depends(get_settings)]):
     return _render_write_action(resource_id, "restart", payload, user, db, settings)
+
+
+@router.get("/render/services/{resource_id}/deploys/{deploy_id}/status")
+def render_deploy_status(
+    resource_id: str,
+    deploy_id: Annotated[str, Path(pattern=r"^dep-[A-Za-z0-9]+$")],
+    _: Annotated[CurrentUser, Depends(get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+    settings: Annotated[Settings, Depends(get_settings)],
+):
+    resource = db.get(ProductResource, uuid.UUID(resource_id))
+    if resource is None or resource.resource_type != "render_service" or resource.provider_account_id is None:
+        raise HTTPException(status_code=404, detail="Serviço Render não encontrado.")
+    account = db.get(ProviderAccount, resource.provider_account_id)
+    if account is None or account.provider != "render" or account.product_id != resource.product_id:
+        raise HTTPException(status_code=409, detail="Vínculo Render inválido.")
+    try:
+        payload = RenderClient(settings, CredentialResolver().resolve(account)).retrieve_deploy(resource.external_id, deploy_id)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=sanitized_error(exc)) from exc
+    return payload
 
 
 @router.get("/products/{product_id}/supabase/projects")
